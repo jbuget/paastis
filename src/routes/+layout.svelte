@@ -10,7 +10,7 @@
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	<p>Développé avec ❤️ et hébergé en 🇫🇷 par les équipes du <a href="https://inclusion.beta.gouv.fr">GIP Plateforme de l'inclusion</a></p>
 </footer>
 
 <style>

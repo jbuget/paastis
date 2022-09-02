@@ -29,6 +29,8 @@
 	"type": "module",
 	"dependencies": {
 		"@fontsource/fira-mono": "^4.5.0",
-		"cookie": "^0.4.1"
+		"cookie": "^0.4.1",
+		"scalingo": "^0.7.0",
+		"scalingo-review-app-manager": "^1.0.1"
 	}
 }
