@@ -49,7 +49,7 @@ p {
 }
 
 a {
-	color: var(--accent-color);
+	color: inherit;
 	text-decoration: none;
 }
 

@@ -95,6 +95,7 @@
 	}
 
 	li.active::before {
+		/*
 		--size: 6px;
 		content: '';
 		width: 0;
@@ -104,6 +105,7 @@
 		left: calc(50% - var(--size));
 		border: var(--size) solid transparent;
 		border-top: var(--size) solid var(--accent-color);
+		*/
 	}
 
 	nav a {

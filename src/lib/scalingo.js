@@ -17,5 +17,10 @@ export async function listAllApps() {
 
 export async function restartApp(appId, region, scope) {
   let client = (region === 'osc-secnum-fr1') ? clientOscSecnumFr1 : clientOscFr1;
-  await client.Containers.restart(appId, scope)
+  await client.Containers.restart(appId, scope);
+}
+
+export async function stopApp(appId, region) {
+  let client = (region === 'osc-secnum-fr1') ? clientOscSecnumFr1 : clientOscFr1;
+  await client.Containers.scale(appId, []);
 }
