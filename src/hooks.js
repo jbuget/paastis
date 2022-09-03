@@ -1,7 +1,16 @@
 import * as cookie from 'cookie';
+import { initializeDb } from './lib/database.js'
+
+let dbUp = false;
 
 /** @type {import('@sveltejs/kit').Handle} */
 export const handle = async ({ event, resolve }) => {
+
+	if (!dbUp) {
+		initializeDb()
+		dbUp = true;
+	}
+
 	const cookies = cookie.parse(event.request.headers.get('cookie') || '');
 	event.locals.userid = cookies['userid'] || crypto.randomUUID();
 

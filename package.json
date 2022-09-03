@@ -2,7 +2,7 @@
 	"name": "multipaas",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev -- --open",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -31,6 +31,7 @@
 		"@fontsource/fira-mono": "^4.5.0",
 		"cookie": "^0.4.1",
 		"scalingo": "^0.7.0",
-		"scalingo-review-app-manager": "^1.0.1"
+		"scalingo-review-app-manager": "^1.0.1",
+		"sqlite3": "^5.0.11"
 	}
 }

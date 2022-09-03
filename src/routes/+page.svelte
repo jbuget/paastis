@@ -1,5 +1,6 @@
 <script>
   import AppList from "../lib/app-list/AppList.svelte";
+  import PlatformList from "../lib/platform-list/PlatformList.svelte";
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -12,24 +13,14 @@
 </svelte:head>
 
 <section>
-  <h1>It works!</h1>
-  <div>
-    <h2>Apps</h2>
-    <AppList apps={data.apps} />
-  </div>
+  <h2>Platforms</h2>
+  <PlatformList platforms={data.platforms} />
+</section>
+
+<section>
+  <h2>Apps</h2>
+  <AppList apps={data.apps} />
 </section>
 
 <style>
-    section {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        flex: 1;
-    }
-
-    h1 {
-        width: 100%;
-    }
-
 </style>
