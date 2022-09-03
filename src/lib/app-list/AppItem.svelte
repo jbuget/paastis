@@ -6,7 +6,7 @@
 </script>
 
 <div>
-	
+
 	{app.name} <button on:click={restartApp(app.id)}>restart</button>
 </div>
 
