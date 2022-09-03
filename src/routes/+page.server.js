@@ -12,16 +12,14 @@ export const load = async ({ locals }) => {
     platforms = []
   }
 
-/*
   let apps = await listAllApps()
   if (!apps) {
     apps = []
   }
-*/
 
   return {
     platforms,
-    apps: []
+    apps
   }
 
   throw error('Oups')

@@ -10,7 +10,7 @@
 </main>
 
 <footer>
-	<p>Développé avec ❤️ et hébergé en 🇫🇷 par les équipes du <a href="https://inclusion.beta.gouv.fr">GIP Plateforme de l'inclusion</a></p>
+	<p>Développé avec ❤️ et hébergé en 🇫🇷 par Jérémy Buget</p>
 </footer>
 
 <style>
