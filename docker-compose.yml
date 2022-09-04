@@ -1,0 +1,22 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    container_name: multipaas_db
+    ports:
+      - 2345:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: multipaas
+
+  adminer:
+    image: adminer
+    restart: always
+    container_name: multipaas_adminer
+    ports:
+      - 2346:8080
