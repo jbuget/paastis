@@ -9,6 +9,31 @@ if (!db) {
 
 function initializeDb() {
   db.serialize(() => {
+    // Accounts
+    db.run(`
+CREATE TABLE IF NOT EXISTS accounts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  name TEXT NOT NULL, 
+  email TEXT NOT NULL, 
+  password TEXT NOT NULL 
+)
+`);
+    db.get(`SELECT COUNT(*) AS count FROM accounts`, [], (err, row) => {
+      if (err) throw err
+      if (row.count < 1) {
+        console.log('🌱 Seeding table "accounts"');
+        [
+          { name: 'John Doe', email: 'john@paastis.io', password: 'password' },
+          { name: 'Jane Smith', email: 'jane@paastis.io', password: 'password' },
+          { name: 'Bruce Wayne', email: 'brucee@paastis.io', password: 'password' },
+        ].forEach(({ name, email, password }) => {
+          db.run("INSERT INTO accounts (name, email, password) VALUES (?, ?, ?)", name, email, password)
+        });
+      } else {
+        console.log('✅ Table "accounts" already seeded');
+      }
+    });
+
     // Providers
     db.run(`
 CREATE TABLE IF NOT EXISTS providers (
@@ -101,6 +126,15 @@ CREATE TABLE IF NOT EXISTS platforms (
   });
 }
 
+function registerUser({ name, email, password }) {
+  return new Promise((resolve, reject) => {
+    db.run("INSERT INTO accounts (name, email, password) VALUES (?, ?, ?)", name, email, password, function(err) {
+      if (err) reject(err);
+      resolve();
+    });
+  });
+}
+
 function listAllPlatforms() {
   return new Promise((resolve, reject) => {
     db.all(`SELECT * FROM platforms ORDER BY name`, [], function(err, rows) {
@@ -111,5 +145,5 @@ function listAllPlatforms() {
 }
 
 export {
-  initializeDb, listAllPlatforms
+  initializeDb, listAllPlatforms, registerUser
 }
