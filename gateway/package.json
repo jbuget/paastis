@@ -1,0 +1,19 @@
+{
+  "name": "paastis-gateway",
+  "version": "0.0.1",
+  "description": "An HTTP-proxy/gateway that automatically pause and restart Scalingo apps in case of inactivity ",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "J. Buget <contact@jbuget.fr>",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@fastify/http-proxy": "^8.2.2",
+    "dotenv": "^16.0.2",
+    "fastify": "^4.5.3",
+    "scalingo": "^0.7.0"
+  },
+  "type": "module"
+}
