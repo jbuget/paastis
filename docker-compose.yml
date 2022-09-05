@@ -6,17 +6,17 @@ services:
   db:
     image: postgres
     restart: always
-    container_name: multipaas_db
+    container_name: paastis_db
     ports:
       - 2345:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: example
-      POSTGRES_DB: multipaas
+      POSTGRES_DB: paastis
 
   adminer:
     image: adminer
     restart: always
-    container_name: multipaas_adminer
+    container_name: paastis_adminer
     ports:
       - 2346:8080
