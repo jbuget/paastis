@@ -28,7 +28,6 @@ export async function getAppDetails(appId, region) {
   const containers = await client.Containers.for(appId);
   const addons = await client.Addons.for(appId);
   const result = { app, containers, addons };
-  console.log(result)
   return result;
 }
 

@@ -96,8 +96,8 @@
         width: 200px;
     }
 
-    .table-cell:nth-child(4) {
-        width: 200px;
+    .table-cell:last-child {
+        flex: 1;
     }
 
     .app-service.status::before {

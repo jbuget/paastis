@@ -50,8 +50,8 @@
         width: 200px;
     }
 
-    .table-header:nth-child(4) {
-        width: 200px;
+    .table-header:last-child {
+        flex: 1;
     }
 
     .table-rows {

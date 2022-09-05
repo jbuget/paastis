@@ -7,7 +7,6 @@ export const load = async ({ locals }) => {
   // locals.userid comes from src/hooks.js
 
   let platforms = await listAllPlatforms()
-  console.log(platforms)
   if (!platforms) {
     platforms = []
   }
