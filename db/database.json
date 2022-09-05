@@ -1,6 +1,0 @@
-{
-  "defaultEnv": {"ENV": "NODE_ENV"},
-
-  "dev": {"ENV": "DATABASE_URL"}
-
-}
