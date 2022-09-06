@@ -1,0 +1,59 @@
+log_format keyvalue
+  'method=$request_method'
+  ' path="$request_uri"'
+  ' host=$host'
+  ' request_id=$http_x_request_id'
+  ' from="$remote_addr"'
+  ' protocol=$scheme'
+  ' status=$status'
+  ' duration=${request_time}s'
+  ' bytes=$bytes_sent'
+  ' referer="$http_referer"'
+  ' user_agent="$http_user_agent"';
+
+# In order to avoid logging access twice per request
+# it is necessary to turn off the top-level (e.g. http) buildpack default access_log
+# as we are about to override it in the server directive here below
+access_log off;
+
+# This server block asks NGINX to respond to requests from
+# port 443 with SSL enabled and accept HTTP/2 connections.
+# This is where the request is then proxied to the fastify_app
+# server group via port 3000.
+server {
+
+  access_log logs/access.log keyvalue;
+  server_name localhost;
+  #listen <%= ENV['PORT'] %>;
+
+  charset utf-8;
+
+  # Disable compression that is performed by the Scalingo router anyway
+  gzip off;
+
+  set $app_name "root";
+  if ($host ~* ^([a-z0-9-]+)\.gateway.*$) {
+    set $app_name $1;
+  }
+
+  # This section matches all paths and proxies it to the backend server
+  # group specified above. Note the additional headers that forward
+  # information about the original request. You might want to set
+  # trustProxy to the address of your NGINX server so the X-Forwarded
+  # fields are used by fastify.
+  location / {
+
+    # This is the directive that proxies requests to the specified server.
+    # If you are using an upstream group, then you do not need to specify a port.
+    # If you are directly proxying to a server e.g.
+    # proxy_pass http://127.0.0.1:3000 then specify a port.
+    proxy_pass http://0.0.0.0:3000/$app_name;
+    proxy_redirect default;
+  }
+
+  add_header X-Content-Type-Options "nosniff";
+  add_header X-Frame-Options "SAMEORIGIN";
+  add_header X-XSS-Protection 1;
+  add_header X-Scalingo-App $app_name;
+
+}

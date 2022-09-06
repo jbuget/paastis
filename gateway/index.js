@@ -3,12 +3,11 @@ import Fastify from 'fastify';
 import httpProxy from '@fastify/http-proxy';
 import { listAllApps } from "./scalingo.js";
 import runningAppsRegister from './register.js';
-import { parse } from 'tldts';
 
 dotenv.config();
 
-const host = process.env.HOST || '0.0.0.0';
-const port = process.env.PORT || 3000;
+const host = process.env.GATEWAY_HOST || '0.0.0.0';
+const port = parseInt(process.env.GATEWAY_PORT, 10) || 3000;
 
 const fastify = Fastify({
   logger: true
@@ -29,40 +28,6 @@ const start = async () => {
           next()
         }
       });
-    });
-
-    fastify.addHook('onRequest', async (request) => {
-/*
-      console.log(`request.headers.hostname=${request.headers.hostname}`);
-      console.log(`request.headers.url=${request.headers.url}`);
-      console.log(`request.url=${request.url}`);
-*/
-
-      const parsedUrl = parse(request.headers.host);
-/*
-      console.log(`parsedUrl.domain=${parsedUrl.domain}`);
-      console.log(`parsedUrl.domainWithoutSuffix=${parsedUrl.domainWithoutSuffix}`);
-      console.log(`parsedUrl.hostname=${parsedUrl.hostname}`);
-      console.log(`parsedUrl.subdomain=${parsedUrl.subdomain}`);
-
-*/
-      if (parsedUrl.subdomain) {
-        const appName = parsedUrl.subdomain.replace('.gateway', '');
-
-        console.log(`appName = ${appName}`);
-
-        const protocol = request.protocol; // https
-        const host = request.headers.host.replace(`${appName}.`, ''); // gateway.example.com
-        const prefix = appName; // my-app
-        const url = request.url || '/';
-
-        const newPath = `${protocol}://${host}/${prefix}${url}`;
-
-        console.log(`newPath=${newPath}`);
-
-        const newUrl = new URL(newPath);
-        request.url = newUrl.href;
-      }
     });
 
     await fastify.listen({ host, port });
