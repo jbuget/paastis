@@ -35,7 +35,6 @@
     "scalingo": "^0.7.0",
     "scalingo-review-app-manager": "^1.0.1",
     "sqlite3": "^5.0.11",
-    "svelte-fa": "^3.0.3",
-    "tldts": "^5.7.91"
+    "svelte-fa": "^3.0.3"
   }
 }

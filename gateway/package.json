@@ -15,7 +15,8 @@
     "fastify": "^4.5.3",
     "node-cron": "^3.0.2",
     "redis": "^4.3.0",
-    "scalingo": "^0.7.0"
+    "scalingo": "^0.7.0",
+    "tldts": "^5.7.91"
   },
   "type": "module"
 }
