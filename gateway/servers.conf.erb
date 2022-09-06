@@ -24,7 +24,7 @@ server {
 
   access_log logs/access.log keyvalue;
   server_name localhost;
-  #listen <%= ENV['PORT'] %>;
+  listen <%= ENV['PORT'] %>;
 
   charset utf-8;
 
@@ -47,8 +47,7 @@ server {
     # If you are using an upstream group, then you do not need to specify a port.
     # If you are directly proxying to a server e.g.
     # proxy_pass http://127.0.0.1:3000 then specify a port.
-    proxy_pass http://0.0.0.0:3000/$app_name;
-    proxy_redirect default;
+    proxy_pass http://0.0.0.0:3000/$app_name$request_uri;
   }
 
   add_header X-Content-Type-Options "nosniff";
