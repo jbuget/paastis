@@ -22,7 +22,7 @@ const start = async () => {
     runningApps.forEach(app => {
       runningAppsRegister.setApp(app.name);
       fastify.register(httpProxy, {
-        upstream: `https://${app.name}.osc-fr1.scalingo.io`, // https://my-app.scalingo.com
+        upstream: `https://${app.name}.${app.region}.scalingo.io`, // https://my-app.scalingo.com
         prefix: app.name, // https://<example.com>/my-app
         preHandler: (request, reply, next) => {
           next()
