@@ -3,6 +3,15 @@ version: '3.1'
 
 services:
 
+  cache:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
   db:
     image: postgres
     restart: always
@@ -20,3 +29,6 @@ services:
     container_name: paastis_adminer
     ports:
       - 2346:8080
+
+volumes:
+  cache:
