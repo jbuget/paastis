@@ -2,37 +2,35 @@ import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import httpProxy from '@fastify/http-proxy';
 import { listAllApps } from "./scalingo.js";
+import runningAppsRegister from './register.js';
 
 dotenv.config();
+
+const host = process.env.HOST || '0.0.0.0';
+const port = process.env.PORT || 3000;
 
 const fastify = Fastify({
   logger: true
 });
 
-fastify.register(httpProxy, {
-  upstream: 'http://my-api.example.com',
-  preHandler: (request, reply, next) => {
-    console.log(request);
-    next()
-  }
-});
-
 const start = async () => {
   try {
     const apps = await listAllApps();
-    apps.forEach((app) => {
+
+    const runningApps = apps.filter((app) => app.status === 'running');
+
+    runningApps.forEach(app => {
+      runningAppsRegister.setApp(app.name);
       fastify.register(httpProxy, {
-        upstream: `https://${app.name}.scalingo.com`, // https://my-app.scalingo.com
+        upstream: `https://${app.name}.osc-fr1.scalingo.io/`, // https://my-app.scalingo.com
         prefix: app.name, // https://<example.com>/my-app
         preHandler: (request, reply, next) => {
-          console.log(request);
           next()
         }
       });
-      console.log(`Registered "${app.name}"`);
     });
 
-    await fastify.listen({ port: 3000 });
+    await fastify.listen({ host, port });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
