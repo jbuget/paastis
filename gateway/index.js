@@ -26,18 +26,43 @@ const start = async () => {
         upstream: `https://${app.name}.osc-fr1.scalingo.io`, // https://my-app.scalingo.com
         prefix: app.name, // https://<example.com>/my-app
         preHandler: (request, reply, next) => {
-          const parsedUrl = parse(request.url);
-          const appName = parsedUrl.subdomain;
-          const newPath = request.url.replace(`${appName}.`, '') + `/${appName}`;
-          const newUrl = new URL(newPath);
-          request.url = newUrl;
-
-          console.log(`appName = ${appName}`);
-          console.log('\n');
-
           next()
         }
       });
+    });
+
+    fastify.addHook('onRequest', async (request) => {
+/*
+      console.log(`request.headers.hostname=${request.headers.hostname}`);
+      console.log(`request.headers.url=${request.headers.url}`);
+      console.log(`request.url=${request.url}`);
+*/
+
+      const parsedUrl = parse(request.headers.host);
+/*
+      console.log(`parsedUrl.domain=${parsedUrl.domain}`);
+      console.log(`parsedUrl.domainWithoutSuffix=${parsedUrl.domainWithoutSuffix}`);
+      console.log(`parsedUrl.hostname=${parsedUrl.hostname}`);
+      console.log(`parsedUrl.subdomain=${parsedUrl.subdomain}`);
+
+*/
+      if (parsedUrl.subdomain) {
+        const appName = parsedUrl.subdomain.replace('.gateway', '');
+
+        console.log(`appName = ${appName}`);
+
+        const protocol = request.protocol; // https
+        const host = request.headers.host.replace(`${appName}.`, ''); // gateway.example.com
+        const prefix = appName; // my-app
+        const url = request.url || '/';
+
+        const newPath = `${protocol}://${host}/${prefix}${url}`;
+
+        console.log(`newPath=${newPath}`);
+
+        const newUrl = new URL(newPath);
+        request.url = newUrl.href;
+      }
     });
 
     await fastify.listen({ host, port });
