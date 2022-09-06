@@ -3,6 +3,7 @@ import Fastify from 'fastify';
 import httpProxy from '@fastify/http-proxy';
 import { listAllApps } from "./scalingo.js";
 import runningAppsRegister from './register.js';
+import { parse } from 'tldts';
 
 dotenv.config();
 
@@ -25,8 +26,15 @@ const start = async () => {
         upstream: `https://${app.name}.osc-fr1.scalingo.io`, // https://my-app.scalingo.com
         prefix: app.name, // https://<example.com>/my-app
         preHandler: (request, reply, next) => {
-          console.log(request);
+          const parsedUrl = parse(request.url);
+          const appName = parsedUrl.subdomain;
+          const newPath = request.url.replace(`${appName}.`, '') + `/${appName}`;
+          const newUrl = new URL(newPath);
+          request.url = newUrl;
+
+          console.log(`appName = ${appName}`);
           console.log('\n');
+
           next()
         }
       });
