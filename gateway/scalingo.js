@@ -25,26 +25,36 @@ export async function listAllApps() {
 
 export async function startApp(appId, region) {
   let client = await getClient(region);
-  try {
-    console.log(`Going to start app ${appId}`)
-    await client.Containers.scale(appId, [{ name: 'web', size: 'M', amount: 1 }]);
-    let count = 0;
-    while (count++ < 30) {
-      console.log(`Waiting app ${appId} to be started…`)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const processes = await client.Containers.processes(appId);
-      const webProcesses = _.filter(processes, { type: 'web' });
-      const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, {state: 'running'});
-      if (allProcessesRunning) {
-        console.log(`App ${appId} started`)
-        return;
-      }
+  console.log(`Going to start app ${appId}`)
+  await client.Containers.scale(appId, [{ name: 'web', size: 'M', amount: 1 }]);
+  let count = 0;
+  while (count++ < 1) {
+    console.log(`Waiting app ${appId} to be running…`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const processes = await client.Containers.processes(appId);
+    const webProcesses = _.filter(processes, { type: 'web' });
+    const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, { state: 'running' });
+    if (allProcessesRunning) {
+      console.log(`App ${appId} started`)
+      return;
     }
-  } catch (e) {
-    throw new Error(`Could not start app ${appId}`);
   }
+  throw new Error(`Timed out waiting for app ${appId} to be running`);
 }
 
+export async function isAppRunning(appId, region) {
+  let client = await getClient(region);
+  const processes = await client.Containers.processes(appId);
+  const webProcesses = _.filter(processes, { type: 'web' });
+  const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, { state: 'running' });
+  return allProcessesRunning;
+}
+
+export async function ensureAppIsRunning(appId, region) {
+  if (!(await isAppRunning('hello-fastify', 'osc-fr1'))) {
+    await startApp(appId, region);
+  }
+}
 
 export async function restartApp(appId, region, scope) {
   let client = await getClient(region);

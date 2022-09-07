@@ -2,8 +2,9 @@ import dotenv from 'dotenv';
 import http from 'http';
 import httpProxy from 'http-proxy';
 import cron from 'node-cron';
-import { startApp } from "./scalingo.js";
+import { ensureAppIsRunning } from "./scalingo.js";
 import runningAppsRegistry from './registry.js';
+import { parse } from "tldts";
 
 dotenv.config();
 
@@ -15,22 +16,28 @@ const proxy = httpProxy.createProxyServer({ changeOrigin: true });
 const server = http.createServer((req, res) => {
   // You can define here your custom logic to handle the request
   // and then proxy the request.
-
-  startApp('hello-fastify', 'osc-fr1').then(() => {
-    proxy.web(req, res, { target: 'https://hello-fastify.osc-fr1.scalingo.io' });
-  });
+  const url = new URL(req.url, `https://${req.headers.host}`);
+  const appName = url.hostname.replace(/\..*/, '');
+  ensureAppIsRunning(appName, 'osc-fr1')
+    .then(() => {
+      proxy.web(req, res, { target: `https://${appName}.osc-fr1.scalingo.io` });
+    }, (err) => {
+      console.error(err);
+      res.statusCode = 502;
+      res.end(err.toString());
+    });
 });
 
 const startServer = async () => {
   try {
-/*
-    const apps = await listAllApps();
+    /*
+        const apps = await listAllApps();
 
-    const runningApps = apps.filter((app) => app.status === 'running');
-    runningApps.forEach(app => {
-      runningAppsRegistry.setApp(app.name);
-    });
-*/
+        const runningApps = apps.filter((app) => app.status === 'running');
+        runningApps.forEach(app => {
+          runningAppsRegistry.setApp(app.name);
+        });
+    */
 
     console.log(`listening on port ${port}`);
     server.listen(port);
