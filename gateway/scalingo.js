@@ -28,7 +28,7 @@ export async function startApp(appId, region) {
   console.log(`Going to start app ${appId}`)
   await client.Containers.scale(appId, [{ name: 'web', size: 'M', amount: 1 }]);
   let count = 0;
-  while (count++ < 1) {
+  while (count++ < 30) {
     console.log(`Waiting app ${appId} to be running…`);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const processes = await client.Containers.processes(appId);
