@@ -1,4 +1,5 @@
 import { clientFromToken } from 'scalingo'
+import _ from 'lodash';
 
 let clientOscFr1;
 let clientOscSecnumFr1;
@@ -21,6 +22,29 @@ export async function listAllApps() {
   let apps = oscFr1Apps.concat(oscSecnumFr1Apps);
   return apps;
 }
+
+export async function startApp(appId, region) {
+  let client = await getClient(region);
+  try {
+    console.log(`Going to start app ${appId}`)
+    await client.Containers.scale(appId, [{ name: 'web', size: 'M', amount: 1 }]);
+    let count = 0;
+    while (count++ < 30) {
+      console.log(`Waiting app ${appId} to be started…`)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const processes = await client.Containers.processes(appId);
+      const webProcesses = _.filter(processes, { type: 'web' });
+      const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, {state: 'running'});
+      if (allProcessesRunning) {
+        console.log(`App ${appId} started`)
+        return;
+      }
+    }
+  } catch (e) {
+    throw new Error(`Could not start app ${appId}`);
+  }
+}
+
 
 export async function restartApp(appId, region, scope) {
   let client = await getClient(region);

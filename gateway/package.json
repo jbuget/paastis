@@ -10,11 +10,8 @@
   "author": "J. Buget <contact@jbuget.fr>",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@fastify/http-proxy": "^8.2.2",
     "dotenv": "^16.0.2",
-    "fastify": "^4.5.3",
     "node-cron": "^3.0.2",
-    "redis": "^4.3.0",
     "scalingo": "^0.7.0",
     "tldts": "^5.7.91"
   },

@@ -1,10 +1,19 @@
 class Application {
 
-  constructor(name, startedAt, lastAccessedAt) {
+  constructor(name, region, startedAt, lastAccessedAt) {
     const now = new Date();
     this._name = name;
+    this._region = region;
     this._startedAt = startedAt || now;
     this._lastAccessedAt = lastAccessedAt || now;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  get region() {
+    return this._region;
   }
 
   updateLastAccessedAt(lastAccessedAt) {
@@ -16,7 +25,7 @@ class Application {
   }
 }
 
-class RunningAppsRegister {
+class RunningAppsRegistry {
 
   constructor() {
     this._runningApps = new Map(); // [app_name<String>, app<Application>]
@@ -35,7 +44,7 @@ class RunningAppsRegister {
   }
 
   getApp(appName) {
-    this._runningApps.get(appName);
+    return this._runningApps.get(appName);
   }
 
   removeApp(appName) {
@@ -57,6 +66,6 @@ class RunningAppsRegister {
 
 }
 
-const register = new RunningAppsRegister();
+const registry = new RunningAppsRegistry();
 
-export default register;
+export default registry;
