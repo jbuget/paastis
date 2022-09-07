@@ -8,8 +8,8 @@ import { parse } from "tldts";
 
 dotenv.config();
 
-const host = process.env.GATEWAY_HOST || '0.0.0.0';
-const port = parseInt(process.env.GATEWAY_PORT, 10) || 3000;
+const host = process.env.HOST || '0.0.0.0';
+const port = parseInt(process.env.PORT, 10) || 3000;
 
 const proxy = httpProxy.createProxyServer({ changeOrigin: true });
 
@@ -30,17 +30,9 @@ const server = http.createServer((req, res) => {
 
 const startServer = async () => {
   try {
-    /*
-        const apps = await listAllApps();
-
-        const runningApps = apps.filter((app) => app.status === 'running');
-        runningApps.forEach(app => {
-          runningAppsRegistry.setApp(app.name);
-        });
-    */
-
-    console.log(`listening on port ${port}`);
-    server.listen(port);
+    server.listen(port, host, () => {
+      console.log(`Server is running on http://${host}:${port}`);
+    });
   } catch (err) {
     process.exit(1);
   }
@@ -78,3 +70,13 @@ startServer();
         return base;
 
  */
+
+/*
+    const apps = await listAllApps();
+
+    const runningApps = apps.filter((app) => app.status === 'running');
+    runningApps.forEach(app => {
+      runningAppsRegistry.setApp(app.name);
+    });
+*/
+
