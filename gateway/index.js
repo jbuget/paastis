@@ -45,7 +45,7 @@ const startCron = async () => {
     console.log('⏰ Checking apps to idle');
     const now = new Date();
 
-    const apps = await listAllApps();
+    const apps = (await listAllApps()).filter((a) => a.name !== 'paastis-gateway');
     apps.forEach((app) => {
       if (app.status !== 'running') {
         registry.removeApp(app.name);
