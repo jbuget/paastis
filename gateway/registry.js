@@ -1,4 +1,4 @@
-class Application {
+class ManagedApplication {
 
   constructor(name, region, startedAt, lastAccessedAt) {
     const now = new Date();
@@ -31,15 +31,12 @@ class RunningAppsRegistry {
     this._runningApps = new Map(); // [app_name<String>, app<Application>]
   }
 
-  setApp(appName) {
-    let app = this._runningApps.get(appName);
-    if (!app) {
-      app = new Application(appName);
-      this._runningApps.add(appName, app);
+  registerApp(appName, appRegion) {
+    let managedApp = this._runningApps.get(appName);
+    if (!managedApp) {
+      managedApp = new ManagedApplication(appName, appRegion);
+      this._runningApps.set(appName, managedApp);
       console.debug(`Registered "${appName}"`);
-    } else {
-      app.updateLastAccessedAt();
-      console.debug(`Updated "${appName}"`);
     }
   }
 
@@ -48,22 +45,15 @@ class RunningAppsRegistry {
   }
 
   removeApp(appName) {
-    this._runningApps.delete(appName);
-    console.debug(`Unregistered "${appName}"`);
+    if (this.isRegisteredApp(appName)) {
+      this._runningApps.delete(appName);
+      console.debug(`Unregistered "${appName}"`);
+    }
   }
 
-  isRunningApp(appName) {
+  isRegisteredApp(appName) {
     return this._runningApps.has(appName);
   }
-
-  findApps() {
-    return this._runningApps;
-  }
-
-  listApps() {
-    this._runningApps.forEach((app) => console.log(app));
-  }
-
 }
 
 const registry = new RunningAppsRegistry();

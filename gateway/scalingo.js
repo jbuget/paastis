@@ -26,7 +26,9 @@ export async function listAllApps() {
 export async function startApp(appId, region) {
   let client = await getClient(region);
   console.log(`Going to start app ${appId}`)
-  await client.Containers.scale(appId, [{ name: 'web', size: 'M', amount: 1 }]);
+  let formation = await client.Containers.for(appId);
+  formation.forEach((f) => (f.amount = 1));
+  await client.Containers.scale(appId, formation);
   let count = 0;
   while (count++ < 30) {
     console.log(`Waiting app ${appId} to be running…`);
@@ -35,7 +37,7 @@ export async function startApp(appId, region) {
     const webProcesses = _.filter(processes, { type: 'web' });
     const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, { state: 'running' });
     if (allProcessesRunning) {
-      console.log(`App ${appId} started`)
+      console.log(`✅ App ${appId} started and running`)
       return;
     }
   }
@@ -63,5 +65,21 @@ export async function restartApp(appId, region, scope) {
 
 export async function stopApp(appId, region) {
   let client = await getClient(region);
-  return client.Containers.scale(appId, []);
+  console.log(`Going to stop app ${appId}`)
+  let formation = await client.Containers.for(appId);
+  formation.forEach((f) => (f.amount = 0));
+  await client.Containers.scale(appId, formation);
+  let count = 0;
+  while (count++ < 30) {
+    console.log(`Waiting app ${appId} to be stopped…`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const processes = await client.Containers.processes(appId);
+    const webProcesses = _.filter(processes, { type: 'web' });
+    const allProcessesStopped = webProcesses.length > 0 && _.every(webProcesses, { state: 'stopped' });
+    if (allProcessesStopped) {
+      console.log(`✅ App ${appId} and all its containers stopped`)
+      return;
+    }
+  }
+  throw new Error(`Timed out waiting for app ${appId} to be stopped`);
 }
