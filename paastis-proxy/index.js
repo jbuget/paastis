@@ -43,7 +43,7 @@ const startCron = async () => {
     const now = new Date();
 
     const ignoredApps = config.registry.ignoredApps;
-    const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a));
+    const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a.name));
     apps.forEach((app) => {
       if (app.status !== 'running') {
         registry.removeApp(app.name);
