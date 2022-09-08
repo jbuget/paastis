@@ -1,5 +1,6 @@
 import { clientFromToken } from 'scalingo'
 import _ from 'lodash';
+import config from "./config.js";
 
 let clientOscFr1;
 let clientOscSecnumFr1;
@@ -30,7 +31,7 @@ export async function startApp(appId, region) {
   formation.forEach((f) => (f.amount = 1));
   await client.Containers.scale(appId, formation);
   let count = 0;
-  while (count++ < 30) {
+  while (count++ < config.scalingo.operationTimeout) {
     console.log(`Waiting app ${appId} to be running…`);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const processes = await client.Containers.processes(appId);
@@ -53,7 +54,7 @@ export async function isAppRunning(appId, region) {
 }
 
 export async function ensureAppIsRunning(appId, region) {
-  if (!(await isAppRunning('hello-fastify', 'osc-fr1'))) {
+  if (!(await isAppRunning(appId, 'osc-fr1'))) {
     await startApp(appId, region);
   }
 }

@@ -1,16 +1,13 @@
-import dotenv from 'dotenv';
 import http from 'http';
 import httpProxy from 'http-proxy';
 import cron from 'node-cron';
+import config from './config.js';
 import { ensureAppIsRunning, listAllApps, stopApp } from "./scalingo.js";
 import registry from './registry.js';
 
-dotenv.config();
-
 const startServer = async () => {
   try {
-    const host = process.env.HOST || '0.0.0.0';
-    const port = parseInt(process.env.PORT, 10) || 3000;
+    const { host, port } = config.server;
 
     const proxy = httpProxy.createProxyServer({ changeOrigin: true });
 
@@ -41,11 +38,12 @@ const startServer = async () => {
 }
 
 const startCron = async () => {
-  cron.schedule('* * * * *', async () => {
+  cron.schedule(config.startAndStop.checkingIntervalCron, async () => {
     console.log('⏰ Checking apps to idle');
     const now = new Date();
 
-    const apps = (await listAllApps()).filter((a) => a.name !== 'paastis-gateway');
+    const ignoredApps = config.registry.ignoredApps;
+    const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a));
     apps.forEach((app) => {
       if (app.status !== 'running') {
         registry.removeApp(app.name);
@@ -56,7 +54,7 @@ const startCron = async () => {
           const diffMs = Math.abs(now - managedApp.lastAccessedAt);
           const diffMins = Math.floor(((diffMs % 86400000) % 3600000) / 60000);
 
-          if (diffMins > 1) {
+          if (diffMins > config.startAndStop.maxIdleTime) {
             // ☠️ app should be stopped
             stopApp(app.name, app.region)
             registry.removeApp(app.name);
