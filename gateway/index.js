@@ -33,7 +33,7 @@ const startServer = async () => {
     });
 
     server.listen(port, host, () => {
-      console.log(`Server is running on http://${host}:${port}`);
+      console.log(`Server is running on https://${host}:${port}`);
     });
   } catch (err) {
     process.exit(1);
