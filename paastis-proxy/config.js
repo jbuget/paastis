@@ -7,7 +7,8 @@ function parseIgnoredApps() {
   if (!value || value.trim().length === 0) {
     return [];
   }
-  return value.split(',').map(v => v.trim());
+  const apps = value.trim().split(',');
+  return apps;
 }
 
 const config = {

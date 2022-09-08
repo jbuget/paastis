@@ -54,6 +54,10 @@ class RunningAppsRegistry {
   isRegisteredApp(appName) {
     return this._runningApps.has(appName);
   }
+
+  listApps() {
+    return Array.from(this._runningApps.keys());
+  }
 }
 
 const registry = new RunningAppsRegistry();

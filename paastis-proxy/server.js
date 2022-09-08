@@ -38,11 +38,14 @@ const startServer = async () => {
 }
 
 const startCron = async () => {
+  const ignoredApps = config.registry.ignoredApps;
+  console.log('ignoredApps: ', ignoredApps);
+
   cron.schedule(config.startAndStop.checkingIntervalCron, async () => {
     console.log('⏰ Checking apps to idle');
     const now = new Date();
 
-    const ignoredApps = config.registry.ignoredApps;
+    console.log(registry.listApps());
     const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a.name));
     apps.forEach((app) => {
       if (app.status !== 'running') {
@@ -54,7 +57,7 @@ const startCron = async () => {
           const diffMs = Math.abs(now - managedApp.lastAccessedAt);
           const diffMins = Math.floor(((diffMs % 86400000) % 3600000) / 60000);
 
-          if (diffMins > config.startAndStop.maxIdleTime) {
+          if (diffMins > config.startAndStop.maxIdleTime - 1) {
             // ☠️ app should be stopped
             stopApp(app.name, app.region)
             registry.removeApp(app.name);
