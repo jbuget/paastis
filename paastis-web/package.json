@@ -34,7 +34,6 @@
     "@fontsource/fira-mono": "^4.5.9",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "cookie": "^0.5.0",
-    "esbuild-darwin-64": "^0.15.7",
     "scalingo": "^0.7.0",
     "scalingo-review-app-manager": "^1.0.1",
     "sqlite3": "^5.0.11",
