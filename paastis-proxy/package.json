@@ -4,7 +4,6 @@
   "description": "An HTTP-proxy/gateway that automatically pause and restart Scalingo apps in case of inactivity ",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "J. Buget <contact@jbuget.fr>",
@@ -17,5 +16,9 @@
     "scalingo": "^0.7.0",
     "tldts": "^5.7.91"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": "16",
+    "npm": "8"
+  }
 }
