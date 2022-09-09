@@ -7,8 +7,7 @@ function parseIgnoredApps() {
   if (!value || value.trim().length === 0) {
     return [];
   }
-  const apps = value.trim().split(',');
-  return apps;
+  return value.trim().split(',');
 }
 
 const config = {
@@ -29,5 +28,9 @@ const config = {
     maxIdleTime: parseInt(process.env.START_AND_STOP_MAX_IDLE_TIME, 10) || 51,
   }
 }
+
+console.log('\n\n\n');
+console.log(config);
+console.log('\n\n\n');
 
 export default config;
