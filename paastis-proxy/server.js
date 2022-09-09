@@ -5,6 +5,8 @@ import config from './config.js';
 import { ensureAppIsRunning, listAllApps, stopApp } from "./scalingo.js";
 import registry from './registry.js';
 
+console.log(`\n8888888b.                            888    d8b\n888   Y88b                           888    Y8P\n888    888                           888\n888   d88P 8888b.   8888b.  .d8888b  888888 888 .d8888b\n8888888P"     "88b     "88b 88K      888    888 88K      \n888       .d888888 .d888888 "Y8888b. 888    888 "Y8888b.\n888       888  888 888  888      X88 Y88b.  888      X88\n888       "Y888888 "Y888888  88888P'  "Y888 888  88888P'\n`);
+
 const startServer = async () => {
   try {
     const { host, port } = config.server;
@@ -38,14 +40,13 @@ const startServer = async () => {
 }
 
 const startCron = async () => {
-  const ignoredApps = config.registry.ignoredApps;
-  console.log('ignoredApps: ', ignoredApps);
 
-  cron.schedule(config.startAndStop.checkingIntervalCron, async () => {
+  async function stopIdleApps() {
     console.log('⏰ Checking apps to idle');
     const now = new Date();
 
-    console.log(registry.listApps());
+    const ignoredApps = config.registry.ignoredApps;
+
     const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a.name));
     apps.forEach((app) => {
       if (app.status !== 'running') {
@@ -68,7 +69,10 @@ const startCron = async () => {
         }
       }
     });
-  });
+    console.log('Active apps: ', registry.listApps());
+  }
+  await stopIdleApps();
+  cron.schedule(config.startAndStop.checkingIntervalCron, stopIdleApps);
 };
 
 startServer();

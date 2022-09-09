@@ -56,7 +56,7 @@ class RunningAppsRegistry {
   }
 
   listApps() {
-    return Array.from(this._runningApps.keys());
+    return Array.from(this._runningApps.values());
   }
 }
 
