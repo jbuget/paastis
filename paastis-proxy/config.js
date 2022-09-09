@@ -12,7 +12,7 @@ function parseIgnoredApps() {
 
 const config = {
   server: {
-    host: process.env.HOST || 'localhost',
+    host: process.env.HOST || '0.0.0.0',
     port: parseInt(process.env.PORT, 10) || 3000,
   },
   registry: {
