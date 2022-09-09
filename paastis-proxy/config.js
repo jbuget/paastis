@@ -18,6 +18,7 @@ const config = {
   registry: {
     type: process.env.REGISTRY_TYPE || 'in-memory', // ['in-memory', 'redis']
     ignoredApps: parseIgnoredApps(),
+    redisUrl: process.env.REGISTRY_REDIS_URL || 'redis://127.0.0.1:6379',
   },
   scalingo: {
     apiToken: process.env.SCALINGO_API_TOKEN || 'tk-us-xxx',
@@ -29,8 +30,8 @@ const config = {
   }
 }
 
-console.log('\n\n\n');
-console.log(config);
-console.log('\n\n\n');
+console.debug();
+console.debug(config);
+console.debug();
 
 export default config;

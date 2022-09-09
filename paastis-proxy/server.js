@@ -3,7 +3,8 @@ import httpProxy from 'http-proxy';
 import cron from 'node-cron';
 import config from './config.js';
 import { ensureAppIsRunning, listAllApps, stopApp } from "./scalingo.js";
-import registry from './registry.js';
+import registry from './registry/index.js';
+import RunningApp from "./registry/RunningApp.js";
 
 const startServer = async () => {
   try {
@@ -15,18 +16,22 @@ const startServer = async () => {
       const url = new URL(req.url, `https://${req.headers.host}`);
       const appName = url.hostname.replace(/\..*/, '');
       ensureAppIsRunning(appName, 'osc-fr1')
-        .then(() => {
-          if (registry.isRegisteredApp(appName)) {
-            registry.getApp(appName).updateLastAccessedAt();
-          } else {
-            registry.registerApp(appName, 'osc-fr1');
+        .then(() => registry.getApp(appName))
+        .then((runningApp) => {
+          if (runningApp) {
+            runningApp.updateLastAccessedAt();
+            return runningApp;
           }
-          proxy.web(req, res, { target: `https://${appName}.osc-fr1.scalingo.io` });
-        }, (err) => {
-          console.error(err);
-          res.statusCode = 502;
-          res.end(err.toString());
-        });
+          return new RunningApp(appName, 'osc-fr1');
+        })
+        .then((runningApp) => registry.setApp(runningApp))
+        .then(() =>
+            proxy.web(req, res, { target: `https://${appName}.osc-fr1.scalingo.io` })
+          , (err) => {
+            console.error(err);
+            res.statusCode = 502;
+            res.end(err.toString());
+          });
     });
 
     server.listen(port, host, () => {
@@ -46,29 +51,32 @@ const startCron = async () => {
     const ignoredApps = config.registry.ignoredApps;
 
     const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a.name));
-    apps.forEach((app) => {
+    for (const app of apps) {
       if (app.status !== 'running') {
-        registry.removeApp(app.name);
+        await registry.removeApp(app.name);
       } else {
-        if (registry.isRegisteredApp(app.name)) {
+        let runningApp = await registry.getApp(app.name);
+        if (runningApp) {
           // already managed
-          const managedApp = registry.getApp(app.name);
+          const managedApp = await registry.getApp(app.name);
           const diffMs = Math.abs(now - managedApp.lastAccessedAt);
           const diffMins = Math.floor(((diffMs % 86400000) % 3600000) / 60000);
 
           if (diffMins > config.startAndStop.maxIdleTime - 1) {
             // ☠️ app should be stopped
-            stopApp(app.name, app.region)
-            registry.removeApp(app.name);
+            await stopApp(app.name, app.region)
+            await registry.removeApp(app.name);
           }
         } else {
           // not yet managed
-          registry.registerApp(app.name, app.region);
+          const runningApp = new RunningApp(app.name, 'osc-fr1');
+          await registry.setApp(runningApp);
         }
       }
-    });
-    console.log('Active apps: ', registry.listApps());
+    }
+    console.log('Active apps: ', (await registry.listApps()));
   }
+
   await stopIdleApps();
   cron.schedule(config.startAndStop.checkingIntervalCron, stopIdleApps);
 };
