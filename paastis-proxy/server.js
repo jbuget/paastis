@@ -2,7 +2,7 @@ import http from 'http';
 import httpProxy from 'http-proxy';
 import cron from 'node-cron';
 import config from './config.js';
-import { ensureAppIsRunning, listAllApps, stopApp } from "./scalingo.js";
+import provider from "./provider/index.js";
 import registry from './registry/index.js';
 import RunningApp from "./registry/RunningApp.js";
 
@@ -15,7 +15,7 @@ const startServer = async () => {
     const server = http.createServer((req, res) => {
       const url = new URL(req.url, `https://${req.headers.host}`);
       const appName = url.hostname.replace(/\..*/, '');
-      ensureAppIsRunning(appName, 'osc-fr1')
+      provider.ensureAppIsRunning(appName, 'osc-fr1')
         .then(() => registry.getApp(appName))
         .then((runningApp) => {
           if (runningApp) {
@@ -50,7 +50,7 @@ const startCron = async () => {
 
     const ignoredApps = config.registry.ignoredApps;
 
-    const apps = (await listAllApps()).filter((a) => !ignoredApps.includes(a.name));
+    const apps = (await provider.listAllApps()).filter((a) => !ignoredApps.includes(a.name));
     for (const app of apps) {
       if (app.status !== 'running') {
         await registry.removeApp(app.name);
@@ -64,7 +64,7 @@ const startCron = async () => {
 
           if (diffMins > config.startAndStop.maxIdleTime - 1) {
             // ☠️ app should be stopped
-            await stopApp(app.name, app.region)
+            await provider.stopApp(app.name, app.region)
             await registry.removeApp(app.name);
           }
         } else {
