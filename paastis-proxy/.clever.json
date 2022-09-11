@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "app_id": "app_0210ab5c-6baf-477b-8c0f-32c18a0e7fb6",
+      "org_id": "user_3d8af481-704b-4408-a0a7-7b3522b36aee",
+      "deploy_url": "https://github.com/jbuget/hello-fastify.git",
+      "name": "hello-fastify",
+      "alias": "hello-fastify"
+    }
+  ]
+}

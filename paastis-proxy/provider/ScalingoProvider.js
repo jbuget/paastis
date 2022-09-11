@@ -3,49 +3,49 @@ import _ from 'lodash';
 import { clientFromToken } from 'scalingo'
 import config from "../config.js";
 import { PaasProvider } from "./PaasProvider.js";
+import { getStatus } from "@clevercloud/client/cjs/utils/app-status.js";
+import { ScalingoApp } from "./PaasApp.js";
 
 export default class ScalingoProvider extends PaasProvider {
 
   _clientOscFr1;
 
-  async getClient(region) {
+  constructor() {
+    super('scalingo');
+  }
+
+  async _getClient() {
     if (!this._clientOscFr1) {
-      this._clientOscFr1 = await clientFromToken(config.scalingo.apiToken, { apiUrl: 'https://api.osc-fr1.scalingo.com' })
+      this._clientOscFr1 = await clientFromToken(config.provider.scalingo.apiToken, { apiUrl: 'https://api.osc-fr1.scalingo.com' })
     }
     return this._clientOscFr1;
   }
 
   async listAllApps() {
-    let clientOscFr1 = await this.getClient('osc-fr1');
-    return await clientOscFr1.Apps.all();
+    let clientOscFr1 = await this._getClient();
+    return (await clientOscFr1.Apps.all()).map(app => new ScalingoApp(app));
   }
 
-  async isAppRunning(appId, region) {
-    let client = await this.getClient(region);
+  async isAppRunning(appId) {
+    let client = await this._getClient();
     const processes = await client.Containers.processes(appId);
     const webProcesses = _.filter(processes, { type: 'web' });
     const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, { state: 'running' });
     return allProcessesRunning;
   }
 
-  async ensureAppIsRunning(appId, region) {
-    if (!(await this.isAppRunning(appId, 'osc-fr1'))) {
-      await this.startApp(appId, region);
-    }
-  }
-
-  async startApp(appId, region) {
+  async startApp(appId) {
 
     const that = this;
 
     async function executeStartApp(resolve, reject) {
-      let client = await that.getClient(region);
+      let client = await that._getClient();
       console.log(`Going to start app ${appId}`)
       let formation = await client.Containers.for(appId);
       formation.forEach((f) => (f.amount = 1));
       await client.Containers.scale(appId, formation);
       let count = 0;
-      while (count++ < config.scalingo.operationTimeout) {
+      while (count++ < config.provider.scalingo.operationTimeout) {
         console.log(`Waiting app ${appId} to be running…`);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const processes = await client.Containers.processes(appId);
@@ -90,12 +90,12 @@ export default class ScalingoProvider extends PaasProvider {
     });
   }
 
-  async stopApp(appId, region) {
+  async stopApp(appId) {
 
     const that = this;
 
     async function executeStopApp(resolve, reject) {
-      let client = await that.getClient(region);
+      let client = await that._getClient();
       console.log(`Stopping app ${appId}`)
       let formation = await client.Containers.for(appId);
       formation.forEach((f) => (f.amount = 0));

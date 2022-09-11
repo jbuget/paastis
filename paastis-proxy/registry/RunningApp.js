@@ -1,7 +1,8 @@
 export default class RunningApp {
 
-  constructor(name, region, startedAt, lastAccessedAt) {
+  constructor(provider, name, region, startedAt, lastAccessedAt) {
     const now = new Date();
+    this._provider = provider;
     this._name = name;
     this._region = region;
 
@@ -16,6 +17,10 @@ export default class RunningApp {
     } else {
       this._lastAccessedAt = now;
     }
+  }
+
+  get provider() {
+    return this._provider;
   }
 
   get name() {
