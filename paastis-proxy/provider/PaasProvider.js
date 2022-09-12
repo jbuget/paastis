@@ -1,5 +1,3 @@
-import { getStatus } from "@clevercloud/client/cjs/utils/app-status.js";
-
 export class PaasProvider {
 
   _name = 'undefined';
@@ -12,11 +10,14 @@ export class PaasProvider {
     return this._name;
   }
 
-  async listAllApps();
+  async listAllApps() {
+  }
 
-  async isAppRunning(appId);
+  async isAppRunning(appId) {
+  }
 
-  async isAppStopped(appId);
+  async isAppStopped(appId) {
+  }
 
   async ensureAppIsRunning(appId) {
     if (!(await this.isAppRunning(appId))) {
@@ -25,10 +26,8 @@ export class PaasProvider {
   }
 
   async startApp(appId) {
-
   }
 
   async stopApp(appId) {
-
   }
 }
