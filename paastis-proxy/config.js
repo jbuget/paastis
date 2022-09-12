@@ -36,7 +36,7 @@ const config = {
   },
   startAndStop: {
     checkingIntervalCron: process.env.START_AND_STOP_CHECKING_INTERVAL_CRON || '* * * * *',
-    maxIdleTime: parseInt(process.env.START_AND_STOP_MAX_IDLE_TIME, 10) || 51,
+    maxIdleTime: parseInt(process.env.START_AND_STOP_MAX_IDLE_TIME, 10) || 15,
   },
   hooks: {
     beforeAppStart: process.env.HOOKS_BEFORE_START,
