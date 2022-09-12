@@ -34,6 +34,14 @@ export default class ScalingoProvider extends PaasProvider {
     return allProcessesRunning;
   }
 
+  async isAppStopped(appId) {
+    let client = await this._getClient();
+    const processes = await client.Containers.processes(appId);
+    const webProcesses = _.filter(processes, { type: 'web' });
+    const allProcessesStopped = webProcesses.length > 0 && _.every(webProcesses, { state: 'stopped' });
+    return allProcessesStopped;
+  }
+
   async startApp(appId) {
 
     const that = this;
@@ -48,10 +56,8 @@ export default class ScalingoProvider extends PaasProvider {
       while (count++ < config.provider.scalingo.operationTimeout) {
         console.log(`Waiting app ${appId} to be running…`);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const processes = await client.Containers.processes(appId);
-        const webProcesses = _.filter(processes, { type: 'web' });
-        const allProcessesRunning = webProcesses.length > 0 && _.every(webProcesses, { state: 'running' });
-        if (allProcessesRunning) {
+        const isAppRunning = await isAppRunning(appId);
+        if (isAppRunning) {
           console.log(`✅ App ${appId} started and running`)
 
           if (config.hooks.afterAppStart) {
